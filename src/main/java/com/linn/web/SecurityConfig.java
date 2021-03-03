@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -17,6 +18,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private OpenIdService openIdService;
+    @Autowired
+    private Custom0auth2UserService custom0auth2UserService;
     @Bean
     public ServletRegistrationBean h2servletRegistration() {
         WebServlet webServlet = new WebServlet(){};
@@ -39,9 +42,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.headers().frameOptions().disable();
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/login/**","/h2-console/**").permitAll()
+        http.cors();
+        http.authorizeRequests().antMatchers("/login/**","/h2-console/**","/singin/**").permitAll()
                 .anyRequest().authenticated().and()
-                .oauth2Login().userInfoEndpoint().oidcUserService(openIdService);
+                .oauth2Login().userInfoEndpoint().oidcUserService(openIdService).userService(custom0auth2UserService);
 
     }
 }
